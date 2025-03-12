@@ -1,0 +1,11 @@
+Rank,Company Name,Description
+1,MediBillMD,"Tailored medical credentialing services across 45+ specialties, HIPAA-compliant and ISO-certified."
+2,Bikham Healthcare,"Revenue cycle management firm serving over 500 clients with a range of medical billing and coding services."
+3,Neolytix,"Offers non-clinical support to healthcare practices with a focus on medical credentialing and enrollment."
+4,Capline Healthcare Management,"Accredited business managing revenue cycles for over 650 clients since 2016."
+5,Billing Advantage,"Delivers medical billing services to over 300 clinicians, specializing in credentialing and coding."
+6,CureMD,"Health information systems provider with customized medical credentialing service including enrollment in various programs."
+7,Practolytics,"High-quality revenue cycle management solutions, delivering timely credentialing and billing solutions."
+8,Physician Practice Specialists,"Focuses solely on medical credentialing and consulting services, handling applications for over 1 million physicians."
+9,PracticeWorx,"Insurance enrollment and credentialing experts that provide services to a wide range of healthcare providers."
+10,PayrHealth,"Payer relationship management firm that offers/enrollment and manages clients' revenue cycles, focusing on strong relationships between payers and providers."

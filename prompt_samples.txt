@@ -1,0 +1,2 @@
+You are 20 years experienced in learning about EPDs as Climate Experts. I am giving you a task to get first the complete list of construction materials that are used in the building life cycle and get me the EPDs of each of the construction materials from "India" point of view, you must get 30 - 40 top manufacturers and get their PDF files and store them in ./tmp folder and create EPD folder inside 
+

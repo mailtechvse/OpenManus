@@ -1,5 +1,5 @@
 import json
-from typing import Any, List, Literal, Optional, Union
+from typing import Any, List, Literal
 
 from pydantic import Field
 
@@ -19,6 +19,8 @@ class ToolCallAgent(ReActAgent):
     name: str = "toolcall"
     description: str = "an agent that can execute tool calls."
 
+    
+    # validation_prompt: str = VALIDATION_PROMPT
     system_prompt: str = SYSTEM_PROMPT
     next_step_prompt: str = NEXT_STEP_PROMPT
 
@@ -30,14 +32,21 @@ class ToolCallAgent(ReActAgent):
 
     tool_calls: List[ToolCall] = Field(default_factory=list)
 
+    # point to chnage for the number of steps
     max_steps: int = 30
-    max_observe: Optional[Union[int, bool]] = None
 
     async def think(self) -> bool:
         """Process current state and decide next actions using tools"""
+        
+        # print (f" Next step prompt {self.next_step_prompt}")
+        
+        
         if self.next_step_prompt:
             user_msg = Message.user_message(self.next_step_prompt)
             self.messages += [user_msg]
+            
+        # print (f" Messages {self.messages}")
+       
 
         # Get response with tool options
         response = await self.llm.ask_tool(
@@ -48,8 +57,13 @@ class ToolCallAgent(ReActAgent):
             tools=self.available_tools.to_params(),
             tool_choice=self.tool_choices,
         )
+        
+        # print (f" Response {response}")
+        
+        
         self.tool_calls = response.tool_calls
-
+        logger.info(f"🧠 {self.name} is thinking...")
+        logger.info(f"📚 {self.name} has needs to evaluate tool calls {self.tool_choices} && response: {response.tool_calls} && response content: {response.content}")
         # Log response info
         logger.info(f"✨ {self.name}'s thoughts: {response.content}")
         logger.info(
@@ -59,7 +73,7 @@ class ToolCallAgent(ReActAgent):
             logger.info(
                 f"🧰 Tools being prepared: {[call.function.name for call in response.tool_calls]}"
             )
-
+       
         try:
             # Handle different tool_choices modes
             if self.tool_choices == "none":
@@ -68,6 +82,7 @@ class ToolCallAgent(ReActAgent):
                         f"🤔 Hmm, {self.name} tried to use tools when they weren't available!"
                     )
                 if response.content:
+                    # here is where we may need to evaluate the reponse vs the user prompt, should we terminate the state or not
                     self.memory.add_message(Message.assistant_message(response.content))
                     return True
                 return False
@@ -80,13 +95,35 @@ class ToolCallAgent(ReActAgent):
                 if self.tool_calls
                 else Message.assistant_message(response.content)
             )
+            # print (f"Assistant Message {assistant_msg}")
+            
             self.memory.add_message(assistant_msg)
+
+            
 
             if self.tool_choices == "required" and not self.tool_calls:
                 return True  # Will be handled in act()
 
             # For 'auto' mode, continue with content if no commands but content exists
             if self.tool_choices == "auto" and not self.tool_calls:
+                # This is where I should be calling my validator
+                
+                # in this case given its auto and tools call has no output we need to do self evaluation
+                
+                validation_string = f"Self Evaulate if you are the user asked the question:{self.memory.messages[0].content} \n\n\n And the Answer you got was: {self.memory.messages[-1].content} \n\n\n Would you be satisfied, return ONLY YES or NO as answer and rest answers is strictly prohibited. Be Critical if you think you have no clue return NO. "
+                
+                system_message = Message.system_message(f"You are a Q&A expert and you have super idea on the questions and answers. Your task is to evaluate the answer given by the AI and provide a feedback as YES or NO")
+                
+                
+                validation_response = await self.llm.ask(messages=[Message.user_message(validation_string)], system_msgs=[system_message])
+                
+                # print (f"validation_response: {validation_response}")
+                
+                # if the answer is validated by LLM stop thinking 
+                if str(validation_response).lower() == "yes":
+                    return False
+                
+           
                 return bool(response.content)
 
             return bool(self.tool_calls)
@@ -111,10 +148,6 @@ class ToolCallAgent(ReActAgent):
         results = []
         for command in self.tool_calls:
             result = await self.execute_tool(command)
-
-            if self.max_observe:
-                result = result[: self.max_observe]
-
             logger.info(
                 f"🎯 Tool '{command.function.name}' completed its mission! Result: {result}"
             )

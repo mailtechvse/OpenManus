@@ -1,0 +1,5 @@
+Name,State,Private IP,Public IP,Tags,Remarks,Misc
+accacia_landing_page_test_server,running,172.31.49.205,3.213.66.189,accacia_landing_page_test_server,,
+stage-interim-instance,stopped,172.31.90.26,54.209.30.62,stage-interim-instance,,
+wordpress-test,stopped,172.31.81.215,,wordpress-test,,
+eng-plt-novu-server,running,172.31.38.196,34.207.133.219,eng-plt-novu-server,,
