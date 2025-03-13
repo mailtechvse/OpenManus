@@ -12,6 +12,9 @@ import json
 from load_dotenv import load_dotenv
 import re
 
+import os
+
+
 
 # app = Flask(__name__)
 app = FastAPI()
@@ -49,12 +52,108 @@ async def run_agent_endpoint(request:Request):
     
     return JSONResponse(content=json.dumps({"return_data":return_data}), status_code=200)
     
+
+# application to save the messages in the file
+@app.route('/messages',methods=["POST","GET","DELETE"])
+async def messages_route(request: Request):
+    
+    # we only use the local file for the reference
+    if request.method == "POST":
+        # here we need to look for the messages that are to be saved in the region
+        json_data = await request.json()
+        
+        print (f"Json Data: {json_data}, type:{type(json_data)}")
+        
+        if "message_file" not in json_data:
+            return JSONResponse({"message": "Error, message_file must be included in the post request"},status_code=400)
+        
+        if "messages" not in json_data:
+            return JSONResponse({"message":"messages in form of array should be loaded in the POST request"},status_code=400)
+        
+        # here we are saving the data in the file
+        
+        message_file = json_data["message_file"]
+        
+        try:
+            os.makedirs("./tmp/file_base")
+        except:
+            print (f"File Already exists")
+            True
+            
+            # the path exists
+        
+        with open(f"./tmp/file_base/{message_file}","wb") as f:
+            f.write(f"{json.dumps(json_data["messages"])}".encode("utf-8"))
+        
+        
+        return JSONResponse({"message": "Operation Successful .. "},status_code=200)
+        
+    
+    elif request.method == "GET":
+        # here if the parameters are set then we can get the file data or we get the file names        
+        request_data = dict(request.query_params)
+        
+        # print (f"Request Data: {request_data},type:{type(request_data)}")
+        if request_data is None or request_data == "" or request_data == {}:
+            # we get the list of the filenames here
+            directory = os.listdir("./tmp/file_base")
+            return JSONResponse({"files":directory},status_code=200)
+
+        elif "message_file" in request_data is not None:
+            content = ""
+            try:
+                f = open(f"./tmp/file_base/{request_data["message_file"]}","rb")
+                content =  f.read()
+            except Exception as e_file:
+                return JSONResponse({"message":f"File {request_data["message_file"]} doesn't exist"},status_code=404)
+                
+           
+            return JSONResponse({"content":json.loads(content.decode("utf-8"))},status_code=200)            
+        
+        else:
+            # malformed requrest
+            return JSONResponse({"message":"Error in request formation"},status_code=400)
+    
+    # here we are deleting the file
+    elif request.method == "DELETE":
+        
+        request_data = await request.json()
+        
+        # here we are going to find the list of the files that are to be deleted
+        
+        if not isinstance(request_data,list):
+            return JSONResponse({"message":"The request should be a list of the files that are to be deleted"}, status_code=400)
+        
+        error_files = []
+        success_files = []
+        
+        for each_file in request_data:
+            
+            try:
+                os.remove(f"./tmp/file_base/{each_file}")
+                success_files.append(each_file)
+            except:
+                error_files.append(each_file)
+                
+        return JSONResponse({"success_files":success_files,"error_files":error_files},status_code=200)
+        
+        
+        
+    else: 
+        return JSONResponse({"message":"Error in request formation"},status_code=400)
+    
+    
     
     
 
 async def main():
     agent = Manus()
-    prompt = input("Enter your prompt (or 'exit'/'quit' to quit): ")
+    
+    if args.prompt is not None:
+        prompt = args.prompt
+    else:
+        prompt = input("Enter your prompt (or 'exit'/'quit' to quit): ")
+    
     await run_agent(prompt, agent)
     
 
@@ -79,6 +178,7 @@ if __name__ == "__main__":
     
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--server", action="store_true", help="Run the server",dest="server")
+    argparser.add_argument("-p","--prompt", required=False, help="Executes the prompt directly",dest="prompt")
     
     args = argparser.parse_args()
     
@@ -88,4 +188,6 @@ if __name__ == "__main__":
         
     else:
         # asgi_app = WsgiToAsgi(app)
+        
+            
         uvicorn.run(app, host="0.0.0.0", port=5010)

@@ -184,3 +184,6 @@ workspace/
 config/config.toml
 
 bin/
+python*/
+tmp/*
+share/*

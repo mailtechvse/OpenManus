@@ -5,17 +5,53 @@ import os
 from load_dotenv import load_dotenv
 import json
 
+
+
 load_dotenv()
 BASE_URL = os.environ["BASE_URL"]
 
 
+
 with st.sidebar:
     
-    aws_access_key = st.text_input("Enter AWS Access Key", type="password")
-    aws_secret_key = st.text_input("Enter AWS Secret Key", type="password")
+    tabs = st.tabs(["Home", "Settings"])
     
+    with st.expander("About"):
+        st.write("Open Manus is a tool that helps you to generate content using OpenAI")
     
+    with tabs[0]:
+        st.title("Home")
+        st.write("Welcome to OpenManus")
+
+    with tabs[1]:
+    
+        st.title("Settings")
+        st.divider()
+        st.header("AWS Settings")
+        aws_access_key = st.text_input("Enter AWS Access Key", type="password")
+        aws_secret_key = st.text_input("Enter AWS Secret Key", type="password")
+        
+        
+        
+        st.divider()
+        st.header("Open AI Settings")
+        open_ai_credentials = st.text_input("Enter Open AI Credentials", type="password")
+        open_ai_model = st.dropdown("Select Open AI Model", options=["gpt-4o-mini", "gpt-o3", "gpt-4o" ])
+        open_ai_base_url = st.text_input("Enter Open AI Base URL",value="https://api.openai.com/v1/")
+        
+        st.divider()
+        st.header("Notion  Settings")
+        notion_credentials  = st.text_input("Enter Notion Credentials", type="password")
+
+        
+
+
+    
+   
+
 st.title("Playground")
+
+
 
 
 if "messages" not in st.session_state:

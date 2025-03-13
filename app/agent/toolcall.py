@@ -19,6 +19,10 @@ class ToolCallAgent(ReActAgent):
     name: str = "toolcall"
     description: str = "an agent that can execute tool calls."
 
+    # here we ae adding previous thought to check the questioning chain if the response of previous is same as now then stop thinking
+    previous_thought: str = ""
+    previous_tool_calls: List = []
+    
     
     # validation_prompt: str = VALIDATION_PROMPT
     system_prompt: str = SYSTEM_PROMPT
@@ -58,6 +62,10 @@ class ToolCallAgent(ReActAgent):
             tool_choice=self.tool_choices,
         )
         
+       
+            
+        
+        
         # print (f" Response {response}")
         
         
@@ -73,6 +81,17 @@ class ToolCallAgent(ReActAgent):
             logger.info(
                 f"🧰 Tools being prepared: {[call.function.name for call in response.tool_calls]}"
             )
+            
+        # lets just do a quick hack here to check if the previous throught is set 
+        if self.previous_thought != "" and self.previous_thought == response.content and len(self.previous_tool_calls) == len (response.tool_calls) and self.previous_tool_calls == response.tool_calls:
+            logger.info(f"x!x!x! Exact Same calls everything is same between previous call and this call, time to exit thinking")
+            return False
+
+        else:
+            # else we just cache it to check next time
+            self.previous_thought = response.content
+            self.previous_tool_calls = response.tool_calls
+       
        
         try:
             # Handle different tool_choices modes

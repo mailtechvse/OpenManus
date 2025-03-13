@@ -11,6 +11,10 @@ from app.tool.google_search import GoogleSearch
 from app.tool.python_execute import PythonExecute
 from app.tool.fda_service import FDAApiTool
 from app.tool.aws_service import AWSServiceTool
+from app.tool.stocks import YahooFinanceApiTool
+from app.tool.crypto import CryptoApiTool
+from app.tool.document_reader import ChromaDBDocumentSearch
+from app.tool.notion import NotionTool, NotionDiscoveryTool
 
 
 class Manus(ToolCallAgent):
@@ -36,7 +40,19 @@ class Manus(ToolCallAgent):
     # Add general-purpose tools to the tool collection
     available_tools: ToolCollection = Field(
         default_factory=lambda: ToolCollection(
-            PythonExecute(), GoogleSearch(), BrowserUseTool(), FileSaver(), Terminate(), FDAApiTool(), AWSServiceTool()
+            PythonExecute(), 
+            GoogleSearch(), 
+            BrowserUseTool(), 
+            FileSaver(), 
+            Terminate(), 
+            FDAApiTool(), 
+            AWSServiceTool(),
+            YahooFinanceApiTool(),
+            CryptoApiTool(),
+            ChromaDBDocumentSearch(),
+            NotionTool(),
+            NotionDiscoveryTool()
+            
         )
     )
 

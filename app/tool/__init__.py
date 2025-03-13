@@ -7,7 +7,10 @@ from app.tool.terminate import Terminate
 from app.tool.tool_collection import ToolCollection
 from app.tool.aws_service import AWSServiceTool
 from app.tool.fda_service import FDAApiTool
-
+from app.tool.stocks import YahooFinanceApiTool
+from app.tool.crypto import CryptoApiTool
+from app.tool.document_reader import ChromaDBDocumentSearch
+from app.tool.notion import NotionTool, NotionDiscoveryTool
 
 __all__ = [
     "BaseTool",
@@ -18,5 +21,10 @@ __all__ = [
     "CreateChatCompletion",
     "PlanningTool",
     "AWSServiceTool",
-    "FDAApiTool"
+    "FDAApiTool",
+    "YahooFinanceApiTool",
+    "CryptoApiTool",
+    "ChromaDBDocumentSearch",
+    "NotionTool",
+    "NotionDiscoveryTool"
 ]
