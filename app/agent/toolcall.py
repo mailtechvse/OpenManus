@@ -83,7 +83,7 @@ class ToolCallAgent(ReActAgent):
             )
             
         # lets just do a quick hack here to check if the previous throught is set 
-        if self.previous_thought != "" and self.previous_thought == response.content and len(self.previous_tool_calls) == len (response.tool_calls) and self.previous_tool_calls == response.tool_calls:
+        if self.previous_thought != "" and self.previous_thought == response.content and self.previous_tool_calls!= None and len(self.previous_tool_calls) == len (response.tool_calls) and self.previous_tool_calls == response.tool_calls:
             logger.info(f"x!x!x! Exact Same calls everything is same between previous call and this call, time to exit thinking")
             return False
 

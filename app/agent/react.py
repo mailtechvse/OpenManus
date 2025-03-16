@@ -12,6 +12,7 @@ class ReActAgent(BaseAgent, ABC):
     name: str
     description: Optional[str] = None
 
+    # added prompts to check for the current and next state
     system_prompt: Optional[str] = None
     next_step_prompt: Optional[str] = None
 

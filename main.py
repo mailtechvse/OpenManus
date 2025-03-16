@@ -12,29 +12,49 @@ import json
 from load_dotenv import load_dotenv
 import re
 
+
+
 import os
 
 
 
 # app = Flask(__name__)
 app = FastAPI()
-load_dotenv()
+
 
 @app.route('/run_agent', methods=['POST'])
 async def run_agent_endpoint(request:Request):
     # prompt = request.json.get('prompt', '')
+    load_dotenv(override=True)
+    
+    print (os.environ)
+    
     json_data = await request.json()
     prompt = json_data.get('prompt', '')
+    messages = json_data.get('messages', [])
     # user_id = json_data.get('user_id', str(uuid4()))
     
     
+    
+    # agent = None
     agent = Manus()
+    # print (f"Agent: {vars(agent.llm)}")
+    agent.initialize_agent()
+    
+    # add messages
+    for each_message in messages:
+        agent.update_memory(each_message["role"],each_message["content"])
+    
+    # agent.llm = LLM()
+    
+    
+    # print (f"API KEY: {agent.llm.api_key}")
     if not prompt:
         return jsonify({"error": "Prompt is required"}), 400
     result = await run_agent(prompt+". Also you must return the data in pure HTML Fomat for it to be rendered on the site container, along with the necessary css and js calls if required. The output should not be saved in the file instead it should be shown as html prompt. You should only give output as HTML and no other text. Also use basic html elements along with the CSS minimum, but you should try and avoid using javascript unless it requires interaction", agent, "")
     
-    print (f"Result: {result}")
-    
+    # print (f"Result: {result}")
+
     # bring everythign to one line 
     result = result.replace("\n","")
     
@@ -92,6 +112,7 @@ async def messages_route(request: Request):
     elif request.method == "GET":
         # here if the parameters are set then we can get the file data or we get the file names        
         request_data = dict(request.query_params)
+        print (f"Request Parameters:{request_data}")
         
         # print (f"Request Data: {request_data},type:{type(request_data)}")
         if request_data is None or request_data == "" or request_data == {}:
@@ -102,9 +123,12 @@ async def messages_route(request: Request):
         elif "message_file" in request_data is not None:
             content = ""
             try:
-                f = open(f"./tmp/file_base/{request_data["message_file"]}","rb")
+                message_file = request_data["message_file"].strip()
+                print (f"Message File: {message_file}")
+                f = open(f"./tmp/file_base/{message_file}","rb")
                 content =  f.read()
             except Exception as e_file:
+                print ("Error in reading the file, Error: ",e_file)
                 return JSONResponse({"message":f"File {request_data["message_file"]} doesn't exist"},status_code=404)
                 
            
@@ -173,6 +197,10 @@ async def run_agent(prompt: str, agent:Manus, user_id: str="")->str:
     return data
    
 
+def start_server():
+    
+    uvicorn.run(app, host="127.0.0.1", port=5010)
+
 
 if __name__ == "__main__":
     
@@ -183,11 +211,12 @@ if __name__ == "__main__":
     args = argparser.parse_args()
     
     if not args.server:
-        
         asyncio.run(main())
+        
+        
         
     else:
         # asgi_app = WsgiToAsgi(app)
+        asyncio.run(start_server())
+                 
         
-            
-        uvicorn.run(app, host="0.0.0.0", port=5010)
