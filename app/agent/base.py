@@ -48,8 +48,15 @@ class BaseAgent(BaseModel, ABC):
     @model_validator(mode="after")
     def initialize_agent(self) -> "BaseAgent":
         """Initialize agent with default settings if not provided."""
-        if self.llm is None or not isinstance(self.llm, LLM):
-            self.llm = LLM(config_name=self.name.lower())
+        
+        # changed as of 2025-03-17: ignored the below condition, this would reinitialize everytime we make the changes or make a call.
+        # if self.llm is None or not isinstance(self.llm, LLM):
+        #     # need to check here
+        #     print (f"Entered here")
+            # self.llm = LLM(config_name=self.name.lower())
+        self.llm = LLM(config_name=self.name.lower())
+        print (f"Entered here #2 {vars(self.llm)}")
+        
         if not isinstance(self.memory, Memory):
             self.memory = Memory()
         return self

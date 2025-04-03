@@ -10,7 +10,7 @@ from openai import (
 )
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
-from app.config import LLMSettings, config
+from app.config import LLMSettings, config, Config
 from app.logger import logger  # Assuming a logger is set up in your app
 from app.schema import Message
 
@@ -30,24 +30,46 @@ class LLM:
     def __init__(
         self, config_name: str = "default", llm_config: Optional[LLMSettings] = None
     ):
-        if not hasattr(self, "client"):  # Only initialize if not already initialized
-            llm_config = llm_config or config.llm
-            llm_config = llm_config.get(config_name, llm_config["default"])
-            self.model = llm_config.model
-            self.max_tokens = llm_config.max_tokens
-            self.temperature = llm_config.temperature
-            self.api_type = llm_config.api_type
-            self.api_key = llm_config.api_key
-            self.api_version = llm_config.api_version
-            self.base_url = llm_config.base_url
-            if self.api_type == "azure":
-                self.client = AsyncAzureOpenAI(
-                    base_url=self.base_url,
-                    api_key=self.api_key,
-                    api_version=self.api_version,
-                )
-            else:
-                self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
+        config = Config()
+        llm_config = llm_config or config.llm
+        print (f"LLM CONFIG {llm_config}")
+        llm_config = llm_config.get(config_name, llm_config["default"])
+        self.model = llm_config.model
+        self.max_tokens = llm_config.max_tokens
+        self.temperature = llm_config.temperature
+        self.api_type = llm_config.api_type
+        self.api_key = llm_config.api_key
+        self.api_version = llm_config.api_version
+        self.base_url = llm_config.base_url
+        if self.api_type == "azure":
+            self.client = AsyncAzureOpenAI(
+                base_url=self.base_url,
+                api_key=self.api_key,
+                api_version=self.api_version,
+            )
+        else:   
+            self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
+        
+        # below has been commented to make sure that the llm is reinitialized everytime we make a call.
+        
+        # if not hasattr(self, "client"):  # Only initialize if not already initialized
+        #     llm_config = llm_config or config.llm
+        #     llm_config = llm_config.get(config_name, llm_config["default"])
+        #     self.model = llm_config.model
+        #     self.max_tokens = llm_config.max_tokens
+        #     self.temperature = llm_config.temperature
+        #     self.api_type = llm_config.api_type
+        #     self.api_key = llm_config.api_key
+        #     self.api_version = llm_config.api_version
+        #     self.base_url = llm_config.base_url
+        #     if self.api_type == "azure":
+        #         self.client = AsyncAzureOpenAI(
+        #             base_url=self.base_url,
+        #             api_key=self.api_key,
+        #             api_version=self.api_version,
+        #         )
+        #     else:
+        #         self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
 
     @staticmethod
     def format_messages(messages: List[Union[dict, Message]]) -> List[dict]:

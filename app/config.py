@@ -62,12 +62,19 @@ class Config:
         return cls._instance
 
     def __init__(self):
-        if not self._initialized:
-            with self._lock:
-                if not self._initialized:
-                    self._config = None
-                    self._load_initial_config()
-                    self._initialized = True
+        
+        # 2025-03-17: added the below code as we need reinitialization of the config everytime we make a call.
+        self._config = None
+        self._load_initial_config()
+        self._initialized = True
+        
+        # 2025-03-17: commented the below code, as we need reinitialization of the config everytime we make a call.
+        # if not self._initialized:
+        #     with self._lock:
+        #         if not self._initialized:
+        #             self._config = None
+        #             self._load_initial_config()
+        #             self._initialized = True
 
     @staticmethod
     def _get_config_path() -> Path:

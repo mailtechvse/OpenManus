@@ -11,6 +11,7 @@ from app.tool.stocks import YahooFinanceApiTool
 from app.tool.crypto import CryptoApiTool
 from app.tool.document_reader import ChromaDBDocumentSearch
 from app.tool.notion import NotionTool, NotionDiscoveryTool
+from app.tool.zoho_service import ZohoCRMTool
 
 __all__ = [
     "BaseTool",
@@ -26,5 +27,6 @@ __all__ = [
     "CryptoApiTool",
     "ChromaDBDocumentSearch",
     "NotionTool",
-    "NotionDiscoveryTool"
+    "NotionDiscoveryTool",
+    "ZohoCRMTool",
 ]

@@ -25,6 +25,8 @@ ChromaDBDocumentSearch: Load documents into ChromaDB, perform vector search, and
 NotionTool: Gives details about projects, information stored on notion
 NotionDiscoveryTool: A Pre-requisite to the NotionTool that searches and fetches the content along with its database, page to search
 
+ZohoCRMTool: Interact with Zoho CRM APIs to retrieve data from the CRM, customer data, leads, deals, accounts and more
+
 Based on user needs, proactively select the most appropriate tool or combination of tools. For complex tasks, you can break down the problem and use different tools step by step to solve it. After using each tool, clearly explain the execution results and suggest the next steps.
 
 If you want to stop interaction, use `terminate` tool/function call. You must evaluate the response to determine if the interaction should be terminated based on the question asked and response provided. If you think the response is going in loop, just stop it. SIMPLE

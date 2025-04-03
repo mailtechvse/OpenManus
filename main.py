@@ -11,9 +11,6 @@ from starlette.responses import JSONResponse, HTMLResponse
 import json
 from load_dotenv import load_dotenv
 import re
-
-
-
 import os
 
 
@@ -32,6 +29,7 @@ async def run_agent_endpoint(request:Request):
     json_data = await request.json()
     prompt = json_data.get('prompt', '')
     messages = json_data.get('messages', [])
+    max_steps = json_data.get('max_steps', 10)
     # user_id = json_data.get('user_id', str(uuid4()))
     
     
@@ -45,13 +43,15 @@ async def run_agent_endpoint(request:Request):
     for each_message in messages:
         agent.update_memory(each_message["role"],each_message["content"])
     
+    # print (f"Agent Memory: {agent.memory.messages}")
+    
     # agent.llm = LLM()
     
     
     # print (f"API KEY: {agent.llm.api_key}")
     if not prompt:
         return jsonify({"error": "Prompt is required"}), 400
-    result = await run_agent(prompt+". Also you must return the data in pure HTML Fomat for it to be rendered on the site container, along with the necessary css and js calls if required. The output should not be saved in the file instead it should be shown as html prompt. You should only give output as HTML and no other text. Also use basic html elements along with the CSS minimum, but you should try and avoid using javascript unless it requires interaction", agent, "")
+    result = await run_agent(prompt+". Also you must return the data in pure HTML Fomat for it to be rendered on the site container without using too many dark or light colors so as to avoid the contrast problem (use neutral colours), along with the necessary css and js calls if required. The output should be saved in the file only if the user explicitly asks else it should render HTML only. You should only give output as HTML and no other text. Also use basic html elements along with the CSS minimum, but you should try and avoid using javascript unless it requires interaction", agent, "")
     
     # print (f"Result: {result}")
 
@@ -212,8 +212,6 @@ if __name__ == "__main__":
     
     if not args.server:
         asyncio.run(main())
-        
-        
         
     else:
         # asgi_app = WsgiToAsgi(app)
