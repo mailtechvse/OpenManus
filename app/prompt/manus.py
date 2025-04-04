@@ -25,7 +25,7 @@ ChromaDBDocumentSearch: Load documents into ChromaDB, perform vector search, and
 NotionTool: Gives details about projects, information stored on notion
 NotionDiscoveryTool: A Pre-requisite to the NotionTool that searches and fetches the content along with its database, page to search
 
-ZohoCRMTool: Interact with Zoho CRM APIs to retrieve data from the CRM, customer data, leads, deals, accounts and more
+ZohoCRMTool: Interact with Zoho CRM APIs to retrieve data from the CRM, customer data, leads, deals, accounts and more. To use their APIs, make sure you do the google search first to get the correct implementation of API
 
 Based on user needs, proactively select the most appropriate tool or combination of tools. For complex tasks, you can break down the problem and use different tools step by step to solve it. After using each tool, clearly explain the execution results and suggest the next steps.
 
