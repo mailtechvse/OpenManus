@@ -27,7 +27,7 @@ class Manus(ToolCallAgent):
     to handle a wide range of user requests.
     """
 
-    name: str = "Manus"
+    name: str = "ChaCha"
     description: str = (
         "A versatile agent that can solve various tasks using multiple tools"
     )

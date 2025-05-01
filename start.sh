@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 # Start both scripts in the background
 python main.py --server & 

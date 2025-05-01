@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 import os
 import sys
+import authentication.oauth as auth
+
 
 # get the previous path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -31,6 +33,9 @@ tools_list = tools.__all__
 
 
 load_dotenv()
+
+# os.environ
+
 BASE_URL = os.environ["BASE_URL"]
 st.session_state["BASE_URL"] = BASE_URL
 (credentials,configuration_array) = runtime_loaders.get_credentials()
@@ -142,6 +147,10 @@ with st.sidebar:
         st.divider()
         st.header("Notion Settings")
         notion_credentials  = st.text_input("Enter Notion Credentials", key="env.NOTION_API_KEY", type="password", value=credentials["env"]["NOTION_API_KEY"],on_change=runtime_loaders.set_credentials)
+        
+        st.divider()
+        st.header("Zoho Integrate")
+        st.button("Integrate Zoho",key="zoho_integration",on_click=auth.run_oauth)
 
         
 

@@ -55,7 +55,7 @@ class BaseAgent(BaseModel, ABC):
         #     print (f"Entered here")
             # self.llm = LLM(config_name=self.name.lower())
         self.llm = LLM(config_name=self.name.lower())
-        print (f"Entered here #2 {vars(self.llm)}")
+        # print (f"Entered here #2 {vars(self.llm)}")
         
         if not isinstance(self.memory, Memory):
             self.memory = Memory()

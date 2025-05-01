@@ -12,6 +12,8 @@ import json
 from load_dotenv import load_dotenv
 import re
 import os
+import requests
+import httpx
 
 
 
@@ -24,7 +26,7 @@ async def run_agent_endpoint(request:Request):
     # prompt = request.json.get('prompt', '')
     load_dotenv(override=True)
     
-    print (os.environ)
+    # print (os.environ)
     
     json_data = await request.json()
     prompt = json_data.get('prompt', '')
@@ -72,6 +74,86 @@ async def run_agent_endpoint(request:Request):
     
     return JSONResponse(content=json.dumps({"return_data":return_data}), status_code=200)
     
+
+@app.route("/oauth2/callback",methods=["GET"])
+async def oauth2_callback(request:Request):
+    # this is the callback function that is used to get the token
+    # here we are going to ge the tokens and use that to pass that to the Env file
+    
+    if "code" not in request.query_params:
+        return JSONResponse({"message":"Error, code not found"},status_code=400)
+    
+    if "state" not in request.query_params:
+        return JSONResponse({"message":"Error, state not found"},status_code=400)
+    
+    #use this to get the token and refresh token from query and state for Zoho 
+    load_dotenv(override=True)
+    code = request.query_params["code"]
+    state = request.query_params["state"]
+    
+    parameters = {
+        "client_id": os.environ["ZOHO_CLIENT_ID"],
+        "client_secret": os.environ["ZOHO_CLIENT_SECRET"],
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": os.environ["REDIRECT_URI"]
+      
+    }
+    # print (parameters)
+    
+    try:
+        
+        async with httpx.AsyncClient() as client:
+            print (os.environ)
+            response = await client.post(url=os.environ.get("TOKEN_URL","https://accounts.zoho.in/oauth2/v2/token/"),data=parameters)
+            token = response.json()["access_token"]
+            refresh_token = response.json()["refresh_token"]
+            
+            # print (f"Token: {token}, Refresh Token: {refresh_token}")
+            
+            with open("./.env","r") as f:
+                lines = f.readlines()
+                
+            new_line = []
+            for each_line in lines:
+                if re.match("^#",each_line):
+                    new_line.append(each_line)
+                    continue
+                
+                each_line_split = each_line.split("=")
+                
+                if each_line_split[0]=="ZOHO_ACCESS_TOKEN":
+                    new_line.append(f"ZOHO_ACCESS_TOKEN={token}\n")
+                    
+                elif each_line_split[0] == "ZOHO_REFRESH_TOKEN":
+                    new_line.append(f"ZOHO_REFRESH_TOKEN={refresh_token}\n")
+
+                else:
+                    new_line.append(each_line)
+                   
+            with open("./.env","w") as f:
+                f.writelines(new_line)
+            # lets get the refresh token
+            
+            
+                                         
+             
+       
+        # print (response)
+        
+        
+    except Exception as e:
+        # return JSONResponse({"message":f"Error in getting the token, Error: {e}"},status_code=500)
+        return HTMLResponse(content=f"Error in getting the token, Error: {e}",status_code=500)
+    
+    return HTMLResponse(content="Token received successfully, You can close this window",status_code=200)
+    # return JSONResponse({"message":"Token received successfully","content":response.json()},status_code=200)
+    
+    
+    
+    
+    
+
 
 # application to save the messages in the file
 @app.route('/messages',methods=["POST","GET","DELETE"])
@@ -172,13 +254,20 @@ async def messages_route(request: Request):
 
 async def main():
     agent = Manus()
-    
-    if args.prompt is not None:
-        prompt = args.prompt
-    else:
-        prompt = input("Enter your prompt (or 'exit'/'quit' to quit): ")
-    
-    await run_agent(prompt, agent)
+    run = True
+    while (run):
+        if args.prompt is not None:
+            prompt = args.prompt
+        else:
+            prompt = input("Enter your prompt (or 'exit'/'quit' to quit): ")
+            if prompt.strip() in ("exit","quit"):
+                run = False
+                break
+        
+        await run_agent(prompt, agent)        
+            
+        
+        
     
 
 

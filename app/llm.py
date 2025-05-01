@@ -32,7 +32,7 @@ class LLM:
     ):
         config = Config()
         llm_config = llm_config or config.llm
-        print (f"LLM CONFIG {llm_config}")
+        # print (f"LLM CONFIG {llm_config}")
         llm_config = llm_config.get(config_name, llm_config["default"])
         self.model = llm_config.model
         self.max_tokens = llm_config.max_tokens
