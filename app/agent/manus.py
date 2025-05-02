@@ -20,7 +20,8 @@ from app.tool.document_reader import ChromaDBDocumentSearch
 from app.tool.notion import NotionTool, NotionDiscoveryTool
 from app.tool.zoho_service import ZohoCRMTool
 from app.tool.str_replace_editor import StrReplaceEditor
-# from app.tool.file_operators import FileOperator
+from app.tool.web_search import WebSearch
+# from app.tool.file_operators import LocalFileOperator
 
 
 
@@ -59,7 +60,9 @@ class Manus(ToolCallAgent):
             ChromaDBDocumentSearch(),
             NotionTool(),
             NotionDiscoveryTool(),
-            ZohoCRMTool()
+            ZohoCRMTool(),
+            WebSearch(),
+            # LocalFileOperator()
         )
     )
 

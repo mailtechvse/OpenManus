@@ -24,17 +24,17 @@ async def main():
 
 if __name__ == "__main__":
 
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument("--server", action="store_true", help="Run the server",dest="server")
-    argparser.add_argument("-p","--prompt", required=False, help="Executes the prompt directly",dest="prompt")
+    # argparser = argparse.ArgumentParser()
+    # argparser.add_argument("--server", action="store_true", help="Run the server",dest="server")
+    # argparser.add_argument("-p","--prompt", required=False, help="Executes the prompt directly",dest="prompt")
 
-    args = argparser.parse_args()
+    # args = argparser.parse_args()
 
-    if not args.server:
+    # if not args.server:
         asyncio.run(main())
 
-    else:
-        # asgi_app = WsgiToAsgi(app)
-        asyncio.run(start_server())
+    # else:
+    #     # asgi_app = WsgiToAsgi(app)
+    #     asyncio.run(start_server())
 
 
